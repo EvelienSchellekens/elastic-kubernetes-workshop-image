@@ -1,0 +1,105 @@
+- hosts: all
+  remote_user: ubuntu
+  gather_facts: yes
+  become: yes
+
+  vars:
+      stack_version: 8.6.1
+      ubuntu_version: focal
+      ansible_python_interpreter: /usr/bin/python3
+
+  tasks:
+
+    - name: Update and upgrade apt packages
+      apt:
+        upgrade: dist
+        force_apt_get: yes
+
+    - name: Change the mmap to a reasonable size
+      shell: sysctl -w vm.max_map_count=262144
+
+    - name: Install some developer tools
+      apt:
+        name:
+          - ntp
+          - ntpdate
+          - curl
+          - gnupg-agent
+          - apt-transport-https
+          - ca-certificates
+          - software-properties-common
+          - whois
+          - jq
+          - zsh
+        update_cache: yes
+        force_apt_get: yes
+
+    - name: Install Ansible dependencies
+      pip:
+        name: docker
+
+    - name: Install Docker's fingerprint
+      apt_key:
+        id: 0EBFCD88
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Install Docker's repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ubuntu_version }} stable
+        state: present
+
+    - name: Install Docker's binaries
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+        force_apt_get: yes
+
+    - name: Start and enable the Docker service
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Fetch Elastic Agent Docker image
+      docker_image:
+        name: docker.elastic.co/beats/elastic-agent:{{ stack_version }}
+        source: pull
+
+    - name: Fetch IDE image
+      docker_image:
+        name: elswork/theia:1.0.1
+        source: pull
+
+    - name: Download Minikube
+      shell: "curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64"
+
+    - name: Install Minikube
+      shell: "install minikube-linux-amd64 /usr/local/bin/minikube"
+
+    - name: Add user in docker group
+      shell: "sudo usermod -aG docker $USER && newgrp docker"
+      become: no
+
+    - name: Install Kubectl
+      snap:
+        name: kubectl
+        classic: true
+
+    - name: Kubectl autocomplete + alias
+      become: no
+      lineinfile:
+        dest: ~/.bashrc
+        line: "{{ item }}"
+      loop:
+        - source <(kubectl completion bash)
+        - alias k="kubectl"
+        - complete -o default -F __start_kubectl k
+
+    - name: Create the workshop directory
+      become: no
+      file:
+        path: ~/workshop
+        state: directory
+        mode: '0755'
