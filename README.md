@@ -1,6 +1,6 @@
-# Monitor Kubernetes Workshop
+# Kubernetes Workshop Image
 
-Hands-on workshop on how to monitor Kubernetes and containerized applications with the Elastic.
+Packer code to build an AWS AMI with Minikube for workshops on how to monitor Kubernetes and containerized applications with the Elastic.
 
 ## Packer Setup for Strigo
 
