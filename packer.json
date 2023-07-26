@@ -1,15 +1,15 @@
 {
-  "_comment": "Ubuntu Server 18.04 LTS (HVM)",
+  "_comment": "Ubuntu Server 22.04 LTS (HVM)",
   "variables": {
     "owner": "Evelien Schellekens",
     "division": "field",
     "org": "sa",
-    "team": "emea-cmrl",
+    "team": "emea-north",
     "project": "kubernetes-workshop",
     "aws_access_key": "{{ env `AWS_ACCESS_KEY_ID` }}",
     "aws_secret_key": "{{ env `AWS_SECRET_ACCESS_KEY` }}",
     "aws_region": "eu-west-1",
-    "source_ami": "ami-027ceacf6a9f484c3",
+    "source_ami": "ami-0f98d0975afb795c7",
     "disk_size": "40"
   },
   "sensitive-variables": ["aws_access_key", "aws_secret_key"],
@@ -26,6 +26,7 @@
       "ami_name": "elastic-monitor-kubernetes-workshop-{{ timestamp }}",
       "ami_users": ["214514861431"],
       "tags": {
+        "Name": "Packer Builder - Elastic Kubernetes Workshop",
         "owner": "{{ user `owner` }}",
         "division": "{{ user `division` }}",
         "org": "{{ user `org` }}",
@@ -52,7 +53,7 @@
     },
     {
       "type": "ansible-local",
-      "playbook_file": "ansible.yml",
+      "playbook_file": "configure.yml",
       "playbook_dir": "."
     },
     {

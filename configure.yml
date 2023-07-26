@@ -4,7 +4,8 @@
   become: yes
 
   vars:
-      stack_version: 8.6.1
+      stack_version: 8.9.0
+      otel_demo_version: 1.4.0
       ubuntu_version: focal
       ansible_python_interpreter: /usr/bin/python3
 
@@ -62,15 +63,11 @@
         state: started
         enabled: yes
 
-    - name: Fetch Elastic Agent Docker image
+    - name: Fetch Docker images
       docker_image:
-        name: docker.elastic.co/beats/elastic-agent:{{ stack_version }}
+        name: "{{ item }}"
         source: pull
-
-    - name: Fetch IDE image
-      docker_image:
-        name: elswork/theia:1.0.1
-        source: pull
+      loop: "{{ lookup('ansible.builtin.template', 'images.j2').splitlines() }}"
 
     - name: Download Minikube
       shell: "curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64"
@@ -82,9 +79,37 @@
       shell: "sudo usermod -aG docker $USER && newgrp docker"
       become: no
 
-    - name: Install Kubectl
+    - name: Create Minikube service
+      copy:
+        dest: "/etc/systemd/system/minikube.service"
+        content: |
+          [Unit]
+          Description=Kickoff Minikube Cluster
+          After=docker.service
+
+          [Service]
+          Type=oneshot
+          ExecStart=/usr/local/bin/minikube start
+          RemainAfterExit=true
+          ExecStop=/usr/local/bin/minikube stop
+          StandardOutput=journal
+          User=ubuntu
+          Group=ubuntu
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Enable and start minikube service
+      systemd:
+        name: minikube
+        state: started
+        enabled: true
+
+    - name: Install Kubectl and Helm
       snap:
-        name: kubectl
+        name:
+          - kubectl
+          - helm
         classic: true
 
     - name: Kubectl autocomplete + alias
@@ -103,3 +128,15 @@
         path: ~/workshop
         state: directory
         mode: '0755'
+
+    - name: Elastic Agent manifest
+      template:
+        src: manifest.yaml.j2
+        dest: ~/workshop/elastic-agent.yaml
+      become: no
+
+    - name: Clone OpenTelemetry demo
+      git:
+        repo: 'https://github.com/elastic/opentelemetry-demo.git'
+        dest: ~/workshop/opentelemetry-demo
+      become: no
