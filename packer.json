@@ -1,5 +1,5 @@
 {
-  "_comment": "Ubuntu Server 22.04 LTS (HVM)",
+  "_comment": "Ubuntu Server 20.04 LTS (HVM)",
   "variables": {
     "owner": "Evelien Schellekens",
     "division": "field",
@@ -20,7 +20,7 @@
       "secret_key": "{{ user `aws_secret_key` }}",
       "region": "{{ user `aws_region` }}",
       "source_ami": "{{ user `source_ami` }}",
-      "instance_type": "t2.large",
+      "instance_type": "t2.xlarge",
       "associate_public_ip_address": true,
       "ssh_username": "ubuntu",
       "ami_name": "elastic-monitor-kubernetes-workshop-{{ timestamp }}",

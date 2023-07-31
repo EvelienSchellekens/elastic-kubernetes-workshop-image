@@ -89,7 +89,7 @@
 
           [Service]
           Type=oneshot
-          ExecStart=/usr/local/bin/minikube start
+          ExecStart=/usr/local/bin/minikube start --memory 8192 --cpus 4
           RemainAfterExit=true
           ExecStop=/usr/local/bin/minikube stop
           StandardOutput=journal
@@ -129,10 +129,16 @@
         state: directory
         mode: '0755'
 
-    - name: Elastic Agent manifest
+    - name: Create empty Elastic Agent manifest file
+      file:
+        path: ~/workshop/elastic-agent.yaml
+        state: touch
+      become: no
+
+    - name: Template Elastic Agent with Elastic defend manifest file
       template:
         src: manifest.yaml.j2
-        dest: ~/workshop/elastic-agent.yaml
+        dest: ~/workshop/elastic-agent-defend.yaml
       become: no
 
     - name: Clone OpenTelemetry demo
