@@ -4,8 +4,8 @@
   become: yes
 
   vars:
-      stack_version: 8.10.0
-      otel_demo_version: 1.4.0
+      stack_version: 8.13.0
+      otel_demo_version: 1.4.0 # helm chart version 0.23.0
       ubuntu_version: focal
       ansible_python_interpreter: /usr/bin/python3
 
@@ -135,7 +135,7 @@
         state: touch
       become: no
 
-    - name: Template Elastic Agent with Elastic defend manifest file
+    - name: Template Elastic Agent manifest file for Defend for Containers
       template:
         src: manifest.yaml.j2
         dest: ~/workshop/elastic-agent-defend.yaml

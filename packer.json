@@ -5,7 +5,8 @@
     "division": "field",
     "org": "sa",
     "team": "emea-north",
-    "project": "kubernetes-workshop",
+    "project": "evelienschellekens",
+    "keep-until": "2025-03-01",
     "aws_access_key": "{{ env `AWS_ACCESS_KEY_ID` }}",
     "aws_secret_key": "{{ env `AWS_SECRET_ACCESS_KEY` }}",
     "aws_region": "eu-west-1",
@@ -25,13 +26,32 @@
       "ssh_username": "ubuntu",
       "ami_name": "elastic-monitor-kubernetes-workshop-{{ timestamp }}",
       "ami_users": ["214514861431"],
-      "tags": {
-        "Name": "Packer Builder - Elastic Kubernetes Workshop",
+      "run_tags": {
+        "Name": "Packer Builder - Elastic Kubernetes Workshop Environment",
         "owner": "{{ user `owner` }}",
         "division": "{{ user `division` }}",
         "org": "{{ user `org` }}",
         "team": "{{ user `team` }}",
-        "project": "{{ user `project` }}"
+        "project": "{{ user `project` }}",
+        "keep-until": "{{ user `keep-until` }}"
+      },
+      "run_volume_tags": {
+        "Name": "Packer Builder - Elastic Kubernetes Workshop Environment",
+        "owner": "{{ user `owner` }}",
+        "division": "{{ user `division` }}",
+        "org": "{{ user `org` }}",
+        "team": "{{ user `team` }}",
+        "project": "{{ user `project` }}",
+        "keep-until": "{{ user `keep-until` }}"
+      },
+      "tags": {
+        "Name": "Packer Builder - Elastic Kubernetes Workshop Environment",
+        "owner": "{{ user `owner` }}",
+        "division": "{{ user `division` }}",
+        "org": "{{ user `org` }}",
+        "team": "{{ user `team` }}",
+        "project": "{{ user `project` }}",
+        "keep-until": "{{ user `keep-until` }}"
       },
       "launch_block_device_mappings": [
         {
